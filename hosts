@@ -1,0 +1,12 @@
+[master]
+10.0.1.101
+
+[client]
+10.0.1.102
+
+[all:children]
+master
+client
+
+[all:vars]
+ansible_ssh_user=vagrant
