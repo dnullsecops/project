@@ -1,16 +1,15 @@
 ---
 - hosts: master
   become: yes
-  remote_user: vagrant
   roles:
-  #  - ansible-role-netdata
+   - ansible-role-netdata
   #  - ansible-role-influxdb
-   - ansible-role-grafana
+  # - ansible-role-grafana
   tags: master
 
-- hosts: client
-  become: yes
-  remote_user: vagrant
-  roles:
-    - ansible-role-netdata
-  tags: client
+# - hosts: client
+#   become: yes
+#   remote_user: vagrant
+#   roles:
+#     - ansible-role-netdata
+#   tags: client
