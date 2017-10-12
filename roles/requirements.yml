@@ -1,0 +1,12 @@
+---
+- src: git@gitlab.qg:devops/ansible-role-netdata.git
+  scm: git
+
+- src: git@gitlab.qg:devops/ansible-role-nginx.git
+  scm: git
+
+- src: git@gitlab.qg:devops/ansible-role-influxdb.git
+  scm: git
+
+- src: git@gitlab.qg:devops/ansible-role-grafana.git
+  scm: git
