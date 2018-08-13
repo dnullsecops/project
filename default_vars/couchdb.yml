@@ -1,0 +1,59 @@
+---
+template:
+  couchdb:
+    name:                       couchdb
+    path:                       "/etc/couchdb/local.d/local.ini"
+    owner:                      couchdb
+    group:                      couchdb
+    include:                    template.couchdb_auth
+    type:                       ini
+    content:
+      couchdb:
+        delayed_commits:        false
+      httpd:
+        bind_address:           "{{ default.couchdb.host }}"
+        port:                   "{{ default.couchdb.port }}"
+        # TODO ask
+        # query_servers:
+        # python:               "{{ exec_dir }}/couchpy"
+      compactions:
+        _default:               "[{db_fragmentation, \"70%\"}, {view_fragmentation, \"60%\"}, {from, \"00:00\"}, {to, \"04:00\"}, {strict_window, true}]"
+      compaction_daemon:
+        check_interval:         300
+      couch_httpd_oauth:
+        use_users_db:           true
+
+  couchdb_auth:
+    name:                       couchdb_auth
+    path:                       "/etc/couchdb/local.d/auth.ini"
+    owner:                      couchdb
+    group:                      couchdb
+    include: False
+    type:                       ini
+    content:
+      admins:
+        admin:                  "{{ default.couchdb.password }}"
+        munin:                  "{{ default.couchdb.munin }}"
+
+  circus_couchdb:
+    name:                       circus_couchdb
+    path:                       "{{ conf_dir }}/circus_couchdb.ini"
+    type:                       ini
+    include: false
+    content:
+      circus:
+        check_delay:            5
+        endpoint:               "ipc://{{ run_dir }}/circus_couchdb_endpoint"
+        pubsub_endpoint:        "ipc://{{ run_dir }}/circus_couchdb_pubsub"
+        umask:                  002
+        logoutput:              "{{ log_dir }}/circus_couchdb.log"
+        statsd:                 0
+      watcher__db:
+        cmd:                    couchdb
+        args:                   "-a {{ conf_dir }}/couchdb.ini  -a {{ conf_dir }}/couchdb.d/auth.ini"
+        stdout_stream.class:    FileStream
+        stderr_stream.class:    FileStream
+        stdout_stream.filename: "{{ log_dir }}/couchdb.stdout.log"
+        stderr_stream.filename: "{{ log_dir }}/couchdb.stderr.log"
+      env__db:
+        HOME:                   "{{ var_dir }}"

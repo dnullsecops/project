@@ -1,15 +1,22 @@
 ---
-- hosts: master
-  become: yes
-  roles:
-   - ansible-role-netdata
-  #  - ansible-role-influxdb
-  # - ansible-role-grafana
-  tags: master
+- hosts: all
+  remote_user: vagrant
+  #vars_files:
+  #- vars/georgia.yml
+  tasks:
+    - merge_vars:
+        lookup_vars_dir: default_vars
+        main_vars: 'template.couchdb_auction.content' # item
+        merge_with: # item.merge_with
+        - template.couchdb.content
+        recurcive: True
+        show_content: True
+        valid_extensions:
+        - yml
+        - yaml
+#        changed: False
+    - debug:
+        msg: "{{ template.couchdb_auction.content }}"
 
-# - hosts: client
-#   become: yes
-#   remote_user: vagrant
-#   roles:
-#     - ansible-role-netdata
-#   tags: client
+#  roles:
+#  - ansible-role-component

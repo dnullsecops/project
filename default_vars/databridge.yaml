@@ -1,0 +1,125 @@
+template:
+  databridge:
+    name:                                databridge
+    #path:                               "/etc/databridge/databridge.yml"
+    type:                                yaml
+    owner:                               psale
+    group:                               psale
+    include:
+    - template.logger
+    content:
+      main:
+        resources_api_server:            "https://{{ default.domain.api_main }}"
+        resources_api_version:           2.3
+        storage_db:                      couchdb
+        storage:
+          host:                          "{{ default.couchdb.host }}"
+          port:                          "{{ default.couchdb.port }}"
+          user:                          "{{ default.couchdb.user }}"
+          password:                      "{{ default.couchdb.password }}"
+          # db_name:                     lots_db
+        client_inc_step_timeout:         0.1
+        client_dec_step_timeout:         0.02
+        drop_threshold_client_cookies:   1.5
+        worker_sleep:                    25
+        retry_default_timeout:           5
+        retries_count:                   10
+        queue_timeout:                   15
+        workers_inc_threshold:           75
+        workers_dec_threshold:           35
+        workers_max:                     1
+        workers_min:                     1
+        retry_workers_min:               1
+        retry_workers_max:               3
+        resource_items_queue_size:       100
+        retry_resource_items_queue_size: -1
+        filter_workers_count:            1
+        watch_interval:                  10
+        resource_items_limit:            100
+        #resource:                        lots
+        #user_agent:                      concierge.databridge
+        bulk_save_limit:                 1000
+        bulk_save_interval:              3
+        bulk_query_limit:                5000
+        bulk_query_interval:             3
+        retrievers_params:
+          down_requests_sleep:           20
+          up_requests_sleep:             20
+          up_wait_sleep:                 30
+          up_wait_sleep_min:             5
+          queue_size:                    1001
+      version:                           1
+      formatters:
+        simple:
+          format:                        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+      handlers:
+        console:
+          class:                         logging.StreamHandler
+          level:                         INFO
+          formatter:                     simple
+          stream:                        ext://sys.stdout
+
+  logger:
+    name: logger
+    type: var
+    content:
+      loggers:
+        openprocurement.bridge.basic:
+          handlers:                      [console]
+          propagate:                     no
+          level:                         DEBUG
+        logger_exc_logger:
+          level:                         ERROR
+          qualname:                      exc_logger
+          propagate:                     0
+          handlers:                      [console]
+        root:
+          level:                         DEBUG
+          handlers:                      [console]
+          propagate:                     0
+
+
+
+  systemd_lots_databridge:
+    name:                                systemd_lots_databridge
+    type:                                ini
+    path:                                "{{ systemd_dir }}/lots_databridge.service"
+    protected:                           false
+    owner:                               root
+    group:                               root
+    content:
+      Unit:
+        Description:                     Lots Databridge
+        After:                           network.target
+      Service:
+        Type:                            simple
+        User:                            psale
+        ExecStart:                       /opt/psale/databridge/bin/databridge /etc/databridge/lots_databridge.yml
+        Restart:                         on-abort
+      Install:
+        WantedBy:                        multi-user.target
+
+
+
+  circus_lots_databridge:
+    name:                                circus_lots_databridge
+    type:                                ini
+    path:                                "{{ conf_dir }}/circus_lots_databridge.ini"
+    content:
+      circus:
+        check_delay:                     5
+        endpoint:                        "ipc://{{ run_dir }}/circus_lots_databridge_endpoint"
+        pubsub_endpoint:                 "ipc://{{ run_dir }}/circus_lots_databridge_pubsub"
+        umask:                           002
+        logoutput:                       "{{ log_dir }}/circus_lots_databridge.log"
+        statsd:                          0
+      watcher__lots_databridge:
+        cmd:                             "{{ exec_dir }}/databridge {{ conf_dir }}/lots_databridge.yaml"
+        numprocesses:                    1
+        stdout_stream.class:             FileStream
+        stderr_stream.class:             FileStream
+        stdout_stream.filename:          "{{ log_dir }}/lots_databridge.stdout.log"
+        stderr_stream.filename:          "{{ log_dir }}/lots_databridge.stderr.log"
+
+
+
