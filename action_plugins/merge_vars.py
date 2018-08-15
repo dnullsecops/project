@@ -26,6 +26,8 @@ from ansible.module_utils._text import to_text
 import glob
 from os import path, walk, getcwd, listdir
 
+from utils import merge as merge_include
+
 VALID_FILE_EXTENSIONS = ['yaml', 'yml']
 class ActionModule(ActionBase):
 
@@ -115,7 +117,11 @@ class ActionModule(ActionBase):
         root_dir = self.get_root_dir(self.lookup_vars_dir)
         found_files = self.find_files(root_dir)
         # found_files = ['/home/shellshock/run/default_vars/couchdb.yml', '/home/shellshock/run/default_vars/couchdb_auction.yml']
-        self.data_store.update(self.load_found_files(found_files))
+        
+        resource = self.load_found_files(found_files)
+        merge_include(resource, self.main_vars, self.recursive)
+        
+        self.data_store.update(resource)
         if self.data_store:
             merged_dict.update(self.merge(self.main_vars, self.data_store))
         # if failed:
