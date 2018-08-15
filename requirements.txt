@@ -1,0 +1,5 @@
+pytest==3.7.1
+dpath==1.4.2
+pyyaml==3.13
+mock==2.0.0
+ansible==2.6.2
