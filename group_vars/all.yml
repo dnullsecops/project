@@ -1,0 +1,17 @@
+role_init:
+  package_manager: apt
+  raw_deps:
+  - python-apt
+  deps:
+  - git
+
+role_monitoring:
+  alerts:
+    telegram_bot: "{{ lookup('env', 'TELEGRAM_BOT_ID') }}"
+    telegram_channels: "{{ lookup('env', 'TELEGRAM_CHAT_ID') }}"
+
+role_fail2ban:
+  bantime: 120
+  maxretry: 5
+  netdata_alert:
+    crit: 1

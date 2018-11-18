@@ -1,0 +1,16 @@
+- hosts: targets
+  remote_user: shellshock
+  gather_facts: false
+  roles:
+  - role: ansible-role-init
+    become: true
+    tags:
+    - init
+  - role: ansible-role-monitoring
+    become: true
+    tags:
+    - monitoring
+  - role: ansible-role-fail2ban
+    become: true
+    tags:
+    - fail2ban

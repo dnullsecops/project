@@ -1,0 +1,5 @@
+alerting_vars/
+*.retry
+external_roles/
+.idea
+
