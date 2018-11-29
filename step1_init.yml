@@ -1,0 +1,9 @@
+---
+- hosts: target
+  gather_facts: False
+  remote_user: vagrant
+  roles:
+  #- role: ansible-role-init
+  - role: ansible-role-component
+    become: yes
+

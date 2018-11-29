@@ -1,5 +1,14 @@
-################## MONITORING ###############
-[master]
-10.0.1.101
+[pentest]
+10.0.8.101
 
+[target1]
+10.0.8.102
+[target2]
+10.0.8.103
+[target3]
+10.0.8.104
 
+[target:children]
+target1
+target2
+target3

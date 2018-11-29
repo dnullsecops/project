@@ -1,9 +1,0 @@
----
-template:
-  couchdb_auction:
-    name:                       couchdb_auction
-    include:
-    - template.couchdb
-    content:
-      httpd:
-        port:                   "{{ default.couchdb.auction_port }}"

@@ -1,0 +1,9 @@
+---
+- hosts: target
+  vars_files:
+  - secret_vars/monitoring_secrets.yml
+  remote_user: shellshock
+  roles:
+  - role: ansible-role-netdata
+    become: yes
+

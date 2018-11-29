@@ -1,5 +1,65 @@
-components:
-- couchdb
-#- lots_databridge
+ansible_pkg_mgr: dnf
+role_init:
+  users:
+    sudo:
+    - shellshock
+  deps:
+  - logrotate
+  - python
+  - policycoreutils-python
+  - python-virtualenv
+  - git
+  - stress
+  - httpd-tools
 
+role_netdata:
+  rpm: http://repo.quintagroup.com/repos/metrics/CentOS7/netdata-1.10.0-11.1.qg.x86_64.rpm
+  config:
+    backend:
+      use: False
+    listen_to: 0.0.0.0
+    memory_mode: save
+    history: 36000
+    update_every: 1
+    OOM_score: 10
+  plugins:
+    use:
+      - logins
+      - web_log
+      - ports
+    configs:
+      ports:
+        name: ports
+        files:
+        - file: ports.chart.py
+          dest: /usr/libexec/netdata/python.d/
+        config:
+          update_every: 1
+      logins:
+        name: logins
+        family: python.d
+        files:
+        - file: logins.chart.py
+          dest: /usr/libexec/netdata/python.d/
+        config:
+          update_every: 1
+  health_check:
+     use: True
+     csv:
+       use: True
+       gsheet_key: ""
+     notify:
+       telegram: ""
+       telegram_recipient: ""
 
+role_nginx:
+  stub_status: true
+  servers:
+    - name: "local_netdata"
+      config: nginx-monitoring.conf.j2
+      application_ports: 19999
+      seboolen: httpd_can_network_connect
+
+role_component:
+  components:
+    - nginx
